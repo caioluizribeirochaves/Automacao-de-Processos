@@ -3,6 +3,7 @@
 import pandas as pd
 from IPython.display import display
 import pathlib
+import win32com.client as win32
 
 
 # Para ler os arquivos presentes na pasta, como os emails, lojas e vendas
@@ -101,4 +102,19 @@ meta_ticketmedio_dia = 500
 meta_ticketmedio_ano = 500
 
 # 5 - Disparar os e - mails
+
+outlook = win32.Dispatch('outlook.application')
+
+nome = emails.loc[emails['Loja']==loja, 'E-mail'].values[0]
+mail = outlook.CreateItem(0)
+mail.To = emails.loc[emails['Loja']==loja, 'E-mail'].values[0]
+mail.Subject = f'OnePage Dia {dia_indicador.day}/{dia_indicador.month} - Loja {loja}'
+mail.Body = ''
+# Ou mail.HTMLBody = <p></p>
+
+# Anexos
+attachment = pathlib.Path.cwd() / caminho_backup / loja / f'{dia_indicador.day}_{dia_indicador.month}_{loja}.xlsx'
+mail.Attachments.Add(str(attachment))
+
+mail.Send()
 
