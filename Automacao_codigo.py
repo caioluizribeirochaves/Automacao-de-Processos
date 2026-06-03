@@ -224,3 +224,31 @@ display(faturamento_lojas_dia)
 
 nome_do_arquivo = f'{dia_indicador.day}_{dia_indicador.month}_Ranking Dia.xlsx'
 faturamento_lojas_dia.to_excel(r'Backup Arquivos Lojas\{}'.format(nome_do_arquivo))
+
+# 7 - Email para diretoria
+
+outlook = win32.Dispatch('outlook.application')
+mail = outlook.CreateItem(0)
+mail.To = emails.loc[emails['Loja']=='Diretoria', 'E-mail'].values[0]
+mail.Subject = f'Ranking Dia {dia_indicador.day}/{dia_indicador.month}'
+mail.body = f'''
+Prezados,
+
+Melhor loja do Dia em Faturamento: Loja {faturamento_lojas_dia.index[0]} com Faturamento R${faturamento_lojas_dia.iloc[0, 0]:.2f}
+Pior loja do Dia em Faturamento: Loja {faturamento_lojas_dia.index[-1]} com Faturamento R${faturamento_lojas_dia.iloc[-1, 0]:.2f}
+
+Melhor loja do Ano em Faturamento: Loja {faturamento_lojas_ano.index[0]} com Faturamento R${faturamento_lojas_ano.iloc[0, 0]:.2f}
+Pior loja do Ano em Faturamento: Loja {faturamento_lojas_ano.index[-1]} com Faturamento R${faturamento_lojas_ano.iloc[-1, 0]:.2f}
+
+Segue em anexo os ranking do ano e do dia de todas as lojas.
+Qualquer dúvida estou a disposição.
+
+Att.,
+Caio Luiz'''
+# Anexos
+attachment = pathlib.Path.cwd() / caminho_backup / f'{dia_indicador.day}_{dia_indicador.month}_Ranking Anual.xlsx'
+mail.Attachments.Add(str(attachment))
+attachment = pathlib.Path.cwd() / caminho_backup / f'{dia_indicador.day}_{dia_indicador.month}_Ranking Dia.xlsx'
+mail.Attachments.Add(str(attachment))
+
+mail.Send()
