@@ -207,3 +207,20 @@ attachment = pathlib.Path.cwd() / caminho_backup / loja / f'{dia_indicador.day}_
 mail.Attachments.Add(str(attachment))
 
 mail.Send()
+
+# 6 - Ranking das lojas com vendas dia e ano
+
+faturamento_lojas = vendas.groupby('Loja')[['Valor Final']].sum()
+faturamento_lojas_ano = faturamento_lojas.sort_values(by='Valor Final', ascending=False)
+display(faturamento_lojas_ano)
+
+nome_do_arquivo = f'{dia_indicador.day}_{dia_indicador.month}_Ranking Anual.xlsx'
+faturamento_lojas_ano.to_excel(r'Backup Arquivos Lojas\{}'.format(nome_do_arquivo))
+
+vendas_dia = vendas.loc[vendas['Data']==dia_indicador, :]
+faturamento_lojas_dia = vendas_dia.groupby('Loja')[['Valor Final']].sum()
+faturamento_lojas_dia = faturamento_lojas_dia.sort_values(by='Valor Final', ascending=False)
+display(faturamento_lojas_dia)
+
+nome_do_arquivo = f'{dia_indicador.day}_{dia_indicador.month}_Ranking Dia.xlsx'
+faturamento_lojas_dia.to_excel(r'Backup Arquivos Lojas\{}'.format(nome_do_arquivo))
